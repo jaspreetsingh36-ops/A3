@@ -1,0 +1,199 @@
+/**
+ * India Cricket Team Stats - Custom CSS Styles
+ * INFR3120 Assignment 3 - Cricket Themed Styling
+ * Author: Jaspreet Singh
+ */
+
+/* CSS Variables for consistent theming */
+:root {
+    --primary-color: #1e40af;      /* Indian blue for primary elements */
+    --secondary-color: #dc2626;    /* Indian orange for accents */
+    --success-color: #16a34a;      /* Green for positive stats */
+    --warning-color: #d97706;      /* Amber for bowling stats */
+    --info-color: #0891b2;         /* Blue for all-rounders */
+    --dark-color: #1f2937;         /* Dark gray for text */
+    --light-color: #f8fafc;        /* Light background */
+}
+
+/* Global Styles */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--light-color);
+    color: var(--dark-color);
+    line-height: 1.6;
+}
+
+/* Navigation Bar Styling */
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+/* Cricket-themed jumbotron/hero section */
+.jumbotron {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Player card styling with hover effects */
+.player-card {
+    border: none;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease-in-out;
+    border-radius: 10px;
+}
+
+.player-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+}
+
+/* Role-specific badge styling */
+.badge-batsman {
+    background-color: var(--success-color);
+}
+
+.badge-bowler {
+    background-color: var(--warning-color);
+    color: white;
+}
+
+.badge-allrounder {
+    background-color: var(--info-color);
+}
+
+.badge-wicketkeeper {
+    background-color: var(--secondary-color);
+}
+
+/* Statistics display styling */
+.player-stats {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 15px;
+    border-left: 4px solid var(--primary-color);
+}
+
+/* Progress bar customization for performance metrics */
+.progress {
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    font-weight: bold;
+    transition: width 0.5s ease-in-out;
+}
+
+/* Form styling enhancements */
+.form-label {
+    font-weight: 600;
+    color: var(--dark-color);
+}
+
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(30, 64, 175, 0.25);
+}
+
+/* Button styling with cricket theme */
+.btn-success {
+    background-color: var(--success-color);
+    border-color: var(--success-color);
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-warning {
+    background-color: var(--warning-color);
+    border-color: var(--warning-color);
+    color: white;
+}
+
+/* Card header styling for player profiles */
+.card-header {
+    font-weight: bold;
+}
+
+/* Responsive adjustments for mobile devices */
+@media (max-width: 768px) {
+    .jumbotron {
+        padding: 2rem 1rem !important;
+    }
+    
+    .display-4 {
+        font-size: 2rem;
+    }
+    
+    .player-card {
+        margin-bottom: 1rem;
+    }
+    
+    .btn-group-vertical {
+        width: 100% !important;
+    }
+}
+
+/* Animation for loading states (future enhancement) */
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+.loading {
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* Table styling for statistics */
+.table th {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+}
+
+.table td {
+    vertical-align: middle;
+}
+
+/* Modal customization */
+.modal-header {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+/* Footer styling */
+footer {
+    margin-top: auto;
+}
+
+/* Utility classes for cricket-specific elements */
+.cricket-ball {
+    width: 20px;
+    height: 20px;
+    background: linear-gradient(45deg, #dc2626, #f59e0b);
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 5px;
+}
+
+.bat-icon {
+    color: #8b5a2b;
+    margin-right: 5px;
+}
+
+/* Print styles for statistics reports */
+@media print {
+    .navbar, .btn, footer {
+        display: none !important;
+    }
+    
+    .card {
+        border: 1px solid #000 !important;
+        box-shadow: none !important;
+    }
+}

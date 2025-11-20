@@ -1,0 +1,113 @@
+<!-- Include header template with navigation -->
+<%- include('partials/header') %>
+
+        <!-- Hero Section - Welcome message and main call-to-action -->
+        <div class="jumbotron bg-success text-white p-5 rounded text-center mb-5">
+            <h1 class="display-4 fw-bold">🏏 Indian Cricket Team</h1>
+            <p class="lead">Track player statistics, performances, and team squad information</p>
+            <hr class="my-4 bg-white">
+            <p>Explore comprehensive data for our national cricket team players</p>
+            <a class="btn btn-light btn-lg mt-3" href="/players" role="button">
+                View Team Squad
+            </a>
+        </div>
+
+        <!-- Features Section - Highlights key application features -->
+        <div class="row mb-5">
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 border-success">
+                    <div class="card-body text-center">
+                        <!-- Batting statistics feature -->
+                        <h5 class="card-title">📊 Batting Stats</h5>
+                        <p class="card-text">View runs, averages, strike rates, and batting performances for all players.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 border-primary">
+                    <div class="card-body text-center">
+                        <!-- Bowling statistics feature -->
+                        <h5 class="card-title">🎯 Bowling Stats</h5>
+                        <p class="card-text">Analyze wickets, economy rates, and bowling figures for our bowlers.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 border-warning">
+                    <div class="card-body text-center">
+                        <!-- Player roles feature -->
+                        <h5 class="card-title">👥 Player Roles</h5>
+                        <p class="card-text">Filter players by roles: Batsmen, Bowlers, All-Rounders, and Wicket-Keepers.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Team Overview Section - Quick glance at team composition -->
+        <div class="row">
+            <div class="col-12">
+                <h2 class="mb-4 border-bottom pb-2">Team Overview</h2>
+                
+                <!-- Check if players data exists -->
+                <% if (players && players.length > 0) { %>
+                    <div class="row">
+                        <!-- Loop through each player and display basic info -->
+                        <% players.forEach(player => { %>
+                            <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                                <div class="card player-card h-100">
+                                    <div class="card-body text-center">
+                                        <!-- Player name and jersey number -->
+                                        <h5 class="card-title">
+                                            <%= player.name %>
+                                            <% if (player.jerseyNumber) { %>
+                                                <small class="text-muted">#<%= player.jerseyNumber %></small>
+                                            <% } %>
+                                        </h5>
+                                        
+                                        <!-- Player role with color coding -->
+                                        <span class="badge 
+                                            <%= player.role === 'Batsman' ? 'bg-success' : 
+                                                player.role === 'Bowler' ? 'bg-primary' : 
+                                                player.role === 'All-Rounder' ? 'bg-warning' : 'bg-info' %>">
+                                            <%= player.role %>
+                                        </span>
+                                        
+                                        <!-- Basic statistics -->
+                                        <div class="mt-3">
+                                            <small class="text-muted d-block">
+                                                Matches: <strong><%= player.matches %></strong>
+                                            </small>
+                                            <% if (player.runs > 0) { %>
+                                                <small class="text-muted d-block">
+                                                    Runs: <strong><%= player.runs.toLocaleString() %></strong>
+                                                </small>
+                                            <% } %>
+                                            <% if (player.wickets > 0) { %>
+                                                <small class="text-muted d-block">
+                                                    Wickets: <strong><%= player.wickets %></strong>
+                                                </small>
+                                            <% } %>
+                                        </div>
+                                        
+                                        <!-- View details button -->
+                                        <a href="/players/<%= player._id %>" class="btn btn-outline-primary btn-sm mt-3">
+                                            View Profile
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        <% }); %>
+                    </div>
+                <% } else { %>
+                    <!-- Message when no players are available -->
+                    <div class="alert alert-info text-center">
+                        <h4>No players in the squad yet!</h4>
+                        <p>Start by adding players to build your team statistics.</p>
+                        <a href="/players/new" class="btn btn-primary">Add First Player</a>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+
+<!-- Include footer template -->
+<%- include('partials/footer') %>

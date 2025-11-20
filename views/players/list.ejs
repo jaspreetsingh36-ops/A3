@@ -1,0 +1,181 @@
+<!-- Include header template -->
+<%- include('../partials/header') %>
+
+        <!-- Page header with title and action buttons -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="display-5">Team Squad</h1>
+            <a href="/players/new" class="btn btn-success">
+                + Add New Player
+            </a>
+        </div>
+
+        <!-- Statistics summary cards -->
+        <div class="row mb-4">
+            <div class="col-md-3 col-6 mb-3">
+                <div class="card bg-success text-white text-center">
+                    <div class="card-body">
+                        <!-- Total batsmen count -->
+                        <h5 class="card-title">
+                            <%= players.filter(p => p.role === 'Batsman').length %>
+                        </h5>
+                        <p class="card-text">Batsmen</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6 mb-3">
+                <div class="card bg-primary text-white text-center">
+                    <div class="card-body">
+                        <!-- Total bowlers count -->
+                        <h5 class="card-title">
+                            <%= players.filter(p => p.role === 'Bowler').length %>
+                        </h5>
+                        <p class="card-text">Bowlers</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6 mb-3">
+                <div class="card bg-warning text-dark text-center">
+                    <div class="card-body">
+                        <!-- Total all-rounders count -->
+                        <h5 class="card-title">
+                            <%= players.filter(p => p.role === 'All-Rounder').length %>
+                        </h5>
+                        <p class="card-text">All-Rounders</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6 mb-3">
+                <div class="card bg-info text-white text-center">
+                    <div class="card-body">
+                        <!-- Total wicket-keepers count -->
+                        <h5 class="card-title">
+                            <%= players.filter(p => p.role === 'Wicket-Keeper').length %>
+                        </h5>
+                        <p class="card-text">Wicket-Keepers</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Players list section -->
+        <% if (players && players.length > 0) { %>
+            <div class="row">
+                <% players.forEach(player => { %>
+                    <div class="col-lg-6 mb-4">
+                        <div class="card h-100 player-card">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <!-- Player name and basic info -->
+                                        <h5 class="card-title">
+                                            <%= player.name %>
+                                            <% if (player.jerseyNumber) { %>
+                                                <span class="badge bg-secondary">#<%= player.jerseyNumber %></span>
+                                            <% } %>
+                                        </h5>
+                                        
+                                        <!-- Player role badge -->
+                                        <span class="badge 
+                                            <%= player.role === 'Batsman' ? 'bg-success' : 
+                                                player.role === 'Bowler' ? 'bg-primary' : 
+                                                player.role === 'All-Rounder' ? 'bg-warning text-dark' : 'bg-info' %> mb-2">
+                                            <%= player.role %>
+                                        </span>
+                                        
+                                        <!-- Player statistics -->
+                                        <div class="player-stats mt-3">
+                                            <div class="row text-center">
+                                                <div class="col-4">
+                                                    <small class="text-muted d-block">Matches</small>
+                                                    <strong><%= player.matches %></strong>
+                                                </div>
+                                                <% if (player.runs > 0) { %>
+                                                    <div class="col-4">
+                                                        <small class="text-muted d-block">Runs</small>
+                                                        <strong><%= player.runs.toLocaleString() %></strong>
+                                                    </div>
+                                                <% } %>
+                                                <% if (player.wickets > 0) { %>
+                                                    <div class="col-4">
+                                                        <small class="text-muted d-block">Wickets</small>
+                                                        <strong><%= player.wickets %></strong>
+                                                    </div>
+                                                <% } %>
+                                            </div>
+                                            <% if (player.average > 0 || player.strikeRate > 0) { %>
+                                                <div class="row text-center mt-2">
+                                                    <% if (player.average > 0) { %>
+                                                        <div class="col-6">
+                                                            <small class="text-muted d-block">Average</small>
+                                                            <strong><%= player.average %></strong>
+                                                        </div>
+                                                    <% } %>
+                                                    <% if (player.strikeRate > 0) { %>
+                                                        <div class="col-6">
+                                                            <small class="text-muted d-block">Strike Rate</small>
+                                                            <strong><%= player.strikeRate %></strong>
+                                                        </div>
+                                                    <% } %>
+                                                </div>
+                                            <% } %>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 text-end">
+                                        <!-- Action buttons -->
+                                        <div class="btn-group-vertical w-100">
+                                            <a href="/players/<%= player._id %>" class="btn btn-outline-primary btn-sm mb-2">
+                                                View
+                                            </a>
+                                            <a href="/players/<%= player._id %>/edit" class="btn btn-outline-warning btn-sm mb-2">
+                                                Edit
+                                            </a>
+                                            <!-- Delete button with confirmation modal trigger -->
+                                            <button type="button" class="btn btn-outline-danger btn-sm" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#deleteModal<%= player._id %>">
+                                                Delete
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Delete Confirmation Modal for this player -->
+                        <div class="modal fade" id="deleteModal<%= player._id %>" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Confirm Delete</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <!-- Warning message with player name -->
+                                        <p>Are you sure you want to remove <strong><%= player.name %></strong> from the team?</p>
+                                        <p class="text-danger"><small>This action cannot be undone!</small></p>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <!-- Cancel button -->
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <!-- Delete form submission -->
+                                        <form method="POST" action="/players/<%= player._id %>/delete" style="display: inline;">
+                                            <button type="submit" class="btn btn-danger">Delete Player</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <% }); %>
+            </div>
+        <% } else { %>
+            <!-- Empty state message -->
+            <div class="alert alert-info text-center">
+                <h4>No players in the squad!</h4>
+                <p>Get started by adding players to build your team statistics.</p>
+                <a href="/players/new" class="btn btn-primary">Add Your First Player</a>
+            </div>
+        <% } %>
+
+<!-- Include footer template -->
+<%- include('../partials/footer') %>

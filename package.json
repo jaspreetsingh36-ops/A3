@@ -1,0 +1,22 @@
+{
+  "name": "india-cricket-stats",
+  "version": "1.0.0",
+  "description": "A CRUD application for tracking India Cricket Team player statistics",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
+  "keywords": ["cricket", "stats", "india", "players", "crud"],
+  "author": "Jaspreet Singh",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "ejs": "^3.1.9",
+    "express": "^4.18.2",
+    "mongoose": "^8.0.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}
