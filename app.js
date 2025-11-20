@@ -18,9 +18,9 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Connect to MongoDB database
-mongoose.connect(process.env.MONGODB_URI || 'mongodb+srv://autorent-user:Autorent2025@cluster0.avlirvg.mongodb.net/cricket-stats?retryWrites=true&w=majority')
-  .then(() => console.log('✅ Connected to MongoDB - Cricket Database')) // Success message
-  .catch(err => console.error('❌ MongoDB connection error:', err)); // Error handling
+mongoose.connect(process.env.MONGODB_URI || 'mongodb+srv://cricket-admin:cricket2025@cluster0.avlirvg.mongodb.net/india-cricket-stats?retryWrites=true&w=majority')
+  .then(() => console.log('✅ Connected to MongoDB Atlas - Cricket Database'))
+  .catch(err => console.error('❌ MongoDB connection error:', err));
 
 // Middleware configuration
 
