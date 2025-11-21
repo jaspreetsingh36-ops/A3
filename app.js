@@ -1,9 +1,3 @@
-/**
- * India Cricket Team Stats - Main Application File
- * INFR3120 Assignment 3 - Cricket Statistics Portal
- * Author: Jaspreet Singh
- */
-
 // Import required modules
 const express = require('express'); // Express.js web framework
 const mongoose = require('mongoose'); // MongoDB object modeling
@@ -19,8 +13,8 @@ const PORT = process.env.PORT || 3000;
 
 // Connect to MongoDB database
 mongoose.connect(process.env.MONGODB_URI || 'mongodb+srv://cricket-admin:cricket2025@cluster0.avlirvg.mongodb.net/india-cricket-stats?retryWrites=true&w=majority')
-  .then(() => console.log('✅ Connected to MongoDB Atlas - Cricket Database'))
-  .catch(err => console.error('❌ MongoDB connection error:', err));
+  .then(() => console.log(' Connected to MongoDB Atlas - Cricket Database'))
+  .catch(err => console.error(' MongoDB connection error:', err));
 
 // Middleware configuration
 
