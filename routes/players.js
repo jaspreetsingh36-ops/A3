@@ -6,7 +6,7 @@
 // Import required modules
 const express = require('express'); // Express framework
 const router = express.Router(); // Create router for player routes
-const Player = require('../models/Player'); // Player database model
+const Player = require('../models/player'); // Player database model
 
 // GET all players - Display complete player list with statistics
 router.get('/', async (req, res) => {
