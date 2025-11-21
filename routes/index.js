@@ -9,7 +9,7 @@ const express = require('express');
 const router = express.Router();
 
 // Import Player model for database operations
-const Player = require('../models/Player');
+const Player = require('../models/player');
 
 // GET home page - Display welcome page with team overview
 router.get('/', async (req, res) => {
