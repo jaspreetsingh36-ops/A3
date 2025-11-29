@@ -1,7 +1,50 @@
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const GitHubStrategy = require('passport-github2').Strategy;
-const User = require('../models/user');
+const mongoose = require('mongoose');
+
+// Create User model dynamically - no file import needed
+const userSchema = new mongoose.Schema({
+  googleId: String,
+  githubId: String,
+  displayName: String,
+  email: String,
+  profilePhoto: String,
+  role: { type: String, default: 'user' }
+}, { timestamps: true });
+
+// Add findOrCreate method to schema
+userSchema.statics.findOrCreate = async function(profile, provider) {
+  try {
+    let query = {};
+    if (provider === 'google') query.googleId = profile.id;
+    if (provider === 'github') query.githubId = profile.id;
+    
+    let user = await this.findOne(query);
+    
+    if (!user) {
+      user = new this({
+        displayName: profile.displayName || 'User',
+        email: profile.emails?.[0]?.value || 'user@example.com',
+        profilePhoto: profile.photos?.[0]?.value || null
+      });
+      
+      if (provider === 'google') user.googleId = profile.id;
+      if (provider === 'github') user.githubId = profile.id;
+      
+      await user.save();
+    }
+    
+    return user;
+  } catch (error) {
+    console.error('Error in findOrCreate:', error);
+    throw error;
+  }
+};
+
+// Create the model
+const User = mongoose.model('User', userSchema);
+console.log('✅ User model created dynamically');
 
 // Serialize user to session
 passport.serializeUser((user, done) => {
@@ -14,6 +57,7 @@ passport.deserializeUser(async (id, done) => {
     const user = await User.findById(id);
     done(null, user);
   } catch (error) {
+    console.error('Deserialize error:', error);
     done(error, null);
   }
 });
@@ -23,13 +67,13 @@ const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
 
 // Check if OAuth credentials are available
 const hasGoogleCredentials = process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET;
-const hasGitHubCredentials = process.env.GITUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET;
+const hasGitHubCredentials = process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET;
 
 console.log('OAuth Configuration:');
 console.log('- Google OAuth:', hasGoogleCredentials ? 'Configured' : 'Not Configured');
 console.log('- GitHub OAuth:', hasGitHubCredentials ? 'Configured' : 'Not Configured');
 
-// Google OAuth Strategy - Only setup if credentials exist
+// Google OAuth Strategy
 if (hasGoogleCredentials) {
   passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
@@ -39,7 +83,6 @@ if (hasGoogleCredentials) {
     try {
       console.log('Google profile received:', profile.displayName);
       
-      // Find or create user
       const user = await User.findOrCreate(profile, 'google');
       return done(null, user);
       
@@ -49,10 +92,10 @@ if (hasGoogleCredentials) {
     }
   }));
 } else {
-  console.warn('⚠️ Google OAuth not configured - missing GOOGLE_CLIENT_ID or GOOGLE_CLIENT_SECRET');
+  console.warn('⚠️ Google OAuth not configured - missing credentials');
 }
 
-// GitHub OAuth Strategy - Only setup if credentials exist
+// GitHub OAuth Strategy
 if (hasGitHubCredentials) {
   passport.use(new GitHubStrategy({
     clientID: process.env.GITHUB_CLIENT_ID,
@@ -63,7 +106,6 @@ if (hasGitHubCredentials) {
     try {
       console.log('GitHub profile received:', profile.displayName);
       
-      // Find or create user
       const user = await User.findOrCreate(profile, 'github');
       return done(null, user);
       
@@ -73,33 +115,7 @@ if (hasGitHubCredentials) {
     }
   }));
 } else {
-  console.warn('⚠️ GitHub OAuth not configured - missing GITHUB_CLIENT_ID or GITHUB_CLIENT_SECRET');
-}
-
-// Dummy strategy for development when no OAuth is configured
-if (!hasGoogleCredentials && !hasGitHubCredentials) {
-  console.log('🔧 Using dummy authentication for development');
-  
-  const LocalStrategy = require('passport-local').Strategy;
-  passport.use(new LocalStrategy(
-    async (username, password, done) => {
-      try {
-        // Create or find a dummy user
-        let user = await User.findOne({ email: 'demo@example.com' });
-        if (!user) {
-          user = new User({
-            displayName: 'Demo User',
-            email: 'demo@example.com',
-            role: 'user'
-          });
-          await user.save();
-        }
-        return done(null, user);
-      } catch (error) {
-        return done(error);
-      }
-    }
-  ));
+  console.warn('⚠️ GitHub OAuth not configured - missing credentials');
 }
 
 module.exports = passport;
