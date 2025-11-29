@@ -6,7 +6,7 @@
 // Import required modules
 const express = require('express');
 const router = express.Router();
-const Player = require('../models/Player');
+const Player = require('../models/player');
 
 // GET all players - Display complete player list with statistics
 router.get('/', async (req, res) => {
