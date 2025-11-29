@@ -17,7 +17,7 @@
             <div class="navbar-nav ms-auto">
                 <% if (isAuthenticated && user) { %>
                     <div class="d-flex align-items-center">
-                        <span class="text-light me-3">Welcome, <%= user.displayName %></span>
+                        <span class="text-light me-3">Welcome, <%= user.displayName || user.username || 'User' %></span>
                         <a class="btn btn-outline-light btn-sm me-2" href="/players">
                             <i class="bi bi-people"></i> Players
                         </a>
@@ -49,10 +49,12 @@
             <% if (isAuthenticated && user) { %>
                 <div class="alert alert-success mx-auto" style="max-width: 500px;">
                     <h4><i class="bi bi-check-circle-fill"></i> Successfully Logged In!</h4>
-                    <p class="mb-0">Welcome, <strong><%= user.displayName %></strong>!</p>
+                    <p class="mb-0">Welcome, <strong><%= user.displayName || user.username || 'User' %></strong>!</p>
                     <small class="text-muted">
                         Logged in with 
-                        <% if (user.googleId) { %>
+                        <% if (user.provider) { %>
+                            <%= user.provider %>
+                        <% } else if (user.googleId) { %>
                             Google
                         <% } else if (user.githubId) { %>
                             GitHub
@@ -102,7 +104,7 @@
     <footer class="text-center py-4 mt-5">
         <div class="container">
             <p class="text-muted mb-0">
-                &copy; 2024 India Cricket Team Statistics. 
+                &copy; 2025 India Cricket Team Statistics. 
                 Built with <i class="bi bi-heart-fill text-danger"></i> for cricket fans.
             </p>
         </div>
