@@ -31,7 +31,7 @@ passport.use(new GoogleStrategy({
   }
 }));
 
-// GitHub OAuth Strategy  
+// GitHub OAuth Strategy - WITH ENHANCED ERROR LOGGING
 passport.use(new GitHubStrategy({
   clientID: process.env.GITHUB_CLIENT_ID,
   clientSecret: process.env.GITHUB_CLIENT_SECRET,
@@ -39,13 +39,35 @@ passport.use(new GitHubStrategy({
   scope: ['user:email', 'read:user']
 }, async (accessToken, refreshToken, profile, done) => {
   try {
-    console.log('GitHub OAuth Successful for:', profile.username);
+    console.log('=== GITHUB OAUTH SUCCESS ===');
+    console.log('Access Token Received:', accessToken ? 'Yes' : 'No');
+    console.log('GitHub Username:', profile.username);
+    console.log('GitHub Display Name:', profile.displayName);
+    console.log('GitHub ID:', profile.id);
+    console.log('GitHub Emails:', profile.emails);
+    console.log('=== END GITHUB OAUTH SUCCESS ===');
+    
     // Return profile directly without database
     return done(null, profile);
   } catch (error) {
-    console.error('GitHub OAuth error:', error);
+    console.error('=== GITHUB OAUTH ERROR ===');
+    console.error('Error details:', error);
+    console.error('Error message:', error.message);
+    console.error('Error stack:', error.stack);
+    console.error('=== END GITHUB OAUTH ERROR ===');
     return done(error, null);
   }
 }));
+
+// Add strategy-level error handling
+GitHubStrategy.prototype.authenticate = function(req, options) {
+  console.log('=== GITHUB AUTH START ===');
+  console.log('Client ID being used:', this._oauth2._clientId);
+  console.log('Callback URL:', this._callbackURL);
+  console.log('=== END GITHUB AUTH START ===');
+  
+  // Call the original authenticate method
+  passport.oauth2.Strategy.prototype.authenticate.call(this, req, options);
+};
 
 module.exports = passport;
