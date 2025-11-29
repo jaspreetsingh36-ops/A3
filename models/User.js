@@ -22,8 +22,8 @@ userSchema.statics.findOrCreate = async function(profile, provider) {
   if (!user) {
     // Create new user
     user = new this({
-      displayName: profile.displayName,
-      email: profile.emails ? profile.emails[0].value : `${profile.username}@github.com`,
+      displayName: profile.displayName || profile.username || 'User',
+      email: profile.emails ? profile.emails[0].value : `${profile.username || profile.id}@${provider}.com`,
       profilePhoto: profile.photos ? profile.photos[0].value : null
     });
     
