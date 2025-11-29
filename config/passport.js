@@ -59,7 +59,8 @@ passport.use(new GitHubStrategy({
   }
 }));
 
-// Add strategy-level error handling
+// Simple debug middleware instead of overriding authenticate
+const originalGitHubAuthenticate = GitHubStrategy.prototype.authenticate;
 GitHubStrategy.prototype.authenticate = function(req, options) {
   console.log('=== GITHUB AUTH START ===');
   console.log('Client ID being used:', this._oauth2._clientId);
@@ -67,7 +68,7 @@ GitHubStrategy.prototype.authenticate = function(req, options) {
   console.log('=== END GITHUB AUTH START ===');
   
   // Call the original authenticate method
-  passport.oauth2.Strategy.prototype.authenticate.call(this, req, options);
+  return originalGitHubAuthenticate.call(this, req, options);
 };
 
 module.exports = passport;
