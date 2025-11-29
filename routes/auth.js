@@ -11,6 +11,7 @@ router.get('/google/callback',
     failureMessage: true 
   }),
   (req, res) => {
+    console.log('Google login successful for:', req.user.displayName);
     res.redirect('/');
   }
 );
@@ -18,40 +19,20 @@ router.get('/google/callback',
 // GitHub OAuth routes
 router.get('/github', passport.authenticate('github'));
 
-// GitHub callback with detailed error logging
-router.get('/github/callback', (req, res, next) => {
-  console.log('=== GITHUB CALLBACK RECEIVED ===');
-  console.log('Query params:', req.query);
-  console.log('=== END GITHUB CALLBACK RECEIVED ===');
-  
+router.get('/github/callback', 
   passport.authenticate('github', { 
     failureRedirect: '/login',
     failureMessage: true 
-  }, (err, user, info) => {
-    console.log('=== GITHUB AUTH RESULT ===');
-    console.log('Error:', err);
-    console.log('User:', user);
-    console.log('Info:', info);
-    console.log('=== END GITHUB AUTH RESULT ===');
-    
-    if (err) {
-      console.error('GitHub authentication failed:', err);
-      return res.redirect('/login?error=github_auth_failed');
-    }
-    
-    req.logIn(user, (loginErr) => {
-      if (loginErr) {
-        console.error('Login after GitHub auth failed:', loginErr);
-        return res.redirect('/login?error=login_failed');
-      }
-      console.log('GitHub login successful for user:', user.username);
-      return res.redirect('/');
-    });
-  })(req, res, next);
-});
+  }),
+  (req, res) => {
+    console.log('GitHub login successful for:', req.user.displayName || req.user.username);
+    res.redirect('/');
+  }
+);
 
 // Logout route
 router.get('/logout', (req, res) => {
+  console.log('User logging out:', req.user ? (req.user.displayName || req.user.username) : 'No user');
   req.logout((err) => {
     if (err) {
       console.error('Logout error:', err);
