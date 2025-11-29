@@ -2,20 +2,22 @@ const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const GitHubStrategy = require('passport-github2').Strategy;
 
-// Serialize user to session
+// Serialize user to session - FIXED
 passport.serializeUser((user, done) => {
-  done(null, user.id);
+  console.log('Serializing user:', user.displayName || user.username);
+  done(null, user);
 });
 
-// Deserialize user from session
-passport.deserializeUser(async (id, done) => {
-  done(null, { id: id });
+// Deserialize user from session - FIXED
+passport.deserializeUser(async (user, done) => {
+  console.log('Deserializing user:', user.displayName || user.username);
+  done(null, user);
 });
 
 // Get base URL from environment
 const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
 
-// Google OAuth Strategy
+// Google OAuth Strategy - FIXED
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
@@ -23,15 +25,25 @@ passport.use(new GoogleStrategy({
 }, async (accessToken, refreshToken, profile, done) => {
   try {
     console.log('Google OAuth Successful for:', profile.displayName);
-    // Return profile directly without database
-    return done(null, profile);
+    
+    // Create user object with all needed fields
+    const user = {
+      id: profile.id,
+      displayName: profile.displayName,
+      email: profile.emails && profile.emails[0] ? profile.emails[0].value : null,
+      photos: profile.photos,
+      provider: 'google',
+      googleId: profile.id
+    };
+    
+    return done(null, user);
   } catch (error) {
     console.error('Google OAuth error:', error);
     return done(error, null);
   }
 }));
 
-// GitHub OAuth Strategy - WITH ENHANCED ERROR LOGGING
+// GitHub OAuth Strategy - FIXED
 passport.use(new GitHubStrategy({
   clientID: process.env.GITHUB_CLIENT_ID,
   clientSecret: process.env.GITHUB_CLIENT_SECRET,
@@ -39,36 +51,24 @@ passport.use(new GitHubStrategy({
   scope: ['user:email', 'read:user']
 }, async (accessToken, refreshToken, profile, done) => {
   try {
-    console.log('=== GITHUB OAUTH SUCCESS ===');
-    console.log('Access Token Received:', accessToken ? 'Yes' : 'No');
-    console.log('GitHub Username:', profile.username);
-    console.log('GitHub Display Name:', profile.displayName);
-    console.log('GitHub ID:', profile.id);
-    console.log('GitHub Emails:', profile.emails);
-    console.log('=== END GITHUB OAUTH SUCCESS ===');
+    console.log('GitHub OAuth Successful for:', profile.username);
     
-    // Return profile directly without database
-    return done(null, profile);
+    // Create user object with all needed fields
+    const user = {
+      id: profile.id,
+      displayName: profile.displayName || profile.username,
+      username: profile.username,
+      email: profile.emails && profile.emails[0] ? profile.emails[0].value : null,
+      photos: profile.photos,
+      provider: 'github',
+      githubId: profile.id
+    };
+    
+    return done(null, user);
   } catch (error) {
-    console.error('=== GITHUB OAUTH ERROR ===');
-    console.error('Error details:', error);
-    console.error('Error message:', error.message);
-    console.error('Error stack:', error.stack);
-    console.error('=== END GITHUB OAUTH ERROR ===');
+    console.error('GitHub OAuth error:', error);
     return done(error, null);
   }
 }));
-
-// Simple debug middleware instead of overriding authenticate
-const originalGitHubAuthenticate = GitHubStrategy.prototype.authenticate;
-GitHubStrategy.prototype.authenticate = function(req, options) {
-  console.log('=== GITHUB AUTH START ===');
-  console.log('Client ID being used:', this._oauth2._clientId);
-  console.log('Callback URL:', this._callbackURL);
-  console.log('=== END GITHUB AUTH START ===');
-  
-  // Call the original authenticate method
-  return originalGitHubAuthenticate.call(this, req, options);
-};
 
 module.exports = passport;
