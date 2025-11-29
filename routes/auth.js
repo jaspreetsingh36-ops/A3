@@ -1,3 +1,23 @@
+const express = require('express');
+const passport = require('passport');
+const router = express.Router();
+
+// Google OAuth routes
+router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+
+router.get('/google/callback', 
+  passport.authenticate('google', { 
+    failureRedirect: '/login',
+    failureMessage: true 
+  }),
+  (req, res) => {
+    res.redirect('/');
+  }
+);
+
+// GitHub OAuth routes
+router.get('/github', passport.authenticate('github'));
+
 // GitHub callback with detailed error logging
 router.get('/github/callback', (req, res, next) => {
   console.log('=== GITHUB CALLBACK RECEIVED ===');
@@ -29,3 +49,15 @@ router.get('/github/callback', (req, res, next) => {
     });
   })(req, res, next);
 });
+
+// Logout route
+router.get('/logout', (req, res) => {
+  req.logout((err) => {
+    if (err) {
+      console.error('Logout error:', err);
+    }
+    res.redirect('/');
+  });
+});
+
+module.exports = router;
