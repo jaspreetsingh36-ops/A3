@@ -4,9 +4,9 @@
  */
 
 // Import required modules
-const express = require('express'); // Express framework
-const router = express.Router(); // Create router for player routes
-const Player = require('../models/player'); // Player database model
+const express = require('express');
+const router = express.Router();
+const Player = require('../models/Player');
 
 // GET all players - Display complete player list with statistics
 router.get('/', async (req, res) => {
@@ -16,15 +16,12 @@ router.get('/', async (req, res) => {
     
     // Render players list view with data
     res.render('players/list', { 
-      title: 'Team Squad - Player Statistics', // Page title
-      page: 'players', // Current page identifier
-      players: players // Pass players data to template
+      title: 'Team Squad - Player Statistics',
+      page: 'players',
+      players: players
     });
   } catch (error) {
-    // Log error for debugging
     console.error('Error fetching players:', error);
-    
-    // Render error page if database operation fails
     res.status(500).render('error', { 
       title: 'Error - Player Data',
       message: 'Failed to load player statistics. Please try again later.'
@@ -34,12 +31,11 @@ router.get('/', async (req, res) => {
 
 // GET form to add new player - Display player creation form
 router.get('/new', (req, res) => {
-  // Render the add player form
   res.render('players/add', {
-    title: 'Add New Player - Team Management', // Page title
-    page: 'add-player', // Current page identifier
-    error: null, // Initialize error as null (no errors on form load)
-    formData: {} // Empty form data for fresh form
+    title: 'Add New Player - Team Management',
+    page: 'add-player',
+    error: null,
+    formData: {}
   });
 });
 
@@ -55,24 +51,22 @@ router.post('/', async (req, res) => {
     // Redirect to players list after successful creation
     res.redirect('/players');
   } catch (error) {
-    // Log error for debugging
     console.error('Error creating player:', error);
 
     // Check if error is a validation error (from Mongoose)
     if (error.name === 'ValidationError') {
-      // Extract all validation error messages
       const errors = Object.values(error.errors).map(err => err.message);
       
       // Re-render the form with error messages and previous input
       return res.render('players/add', {
         title: 'Add New Player - Team Management',
         page: 'add-player',
-        error: errors.join(', '), // Combine error messages
-        formData: req.body // Pass back user's form data for correction
+        error: errors.join(', '),
+        formData: req.body
       });
     }
 
-    // Handle other types of errors (database connection, etc.)
+    // Handle other types of errors
     res.status(500).render('error', {
       title: 'Error - Add Player',
       message: 'Failed to add new player. Please try again.'
@@ -88,7 +82,6 @@ router.get('/:id', async (req, res) => {
     
     // Check if player exists in database
     if (!player) {
-      // Return 404 error if player not found
       return res.status(404).render('error', {
         title: 'Player Not Found',
         message: 'The requested player could not be found in the team squad.'
@@ -97,15 +90,12 @@ router.get('/:id', async (req, res) => {
     
     // Render player details view with player data
     res.render('players/details', {
-      title: `Player Profile - ${player.name}`, // Dynamic title with player name
-      page: 'player-details', // Current page identifier
-      player: player // Pass player data to template
+      title: `Player Profile - ${player.name}`,
+      page: 'player-details',
+      player: player
     });
   } catch (error) {
-    // Log error for debugging
     console.error('Error fetching player details:', error);
-    
-    // Render error page if player fetch fails
     res.status(500).render('error', {
       title: 'Error - Player Profile',
       message: 'Failed to load player profile. Please try again.'
@@ -121,7 +111,6 @@ router.get('/:id/edit', async (req, res) => {
     
     // Check if player exists
     if (!player) {
-      // Return 404 error if player not found
       return res.status(404).render('error', {
         title: 'Player Not Found',
         message: 'The player you are trying to edit does not exist.'
@@ -130,16 +119,13 @@ router.get('/:id/edit', async (req, res) => {
     
     // Render edit form with existing player data
     res.render('players/edit', {
-      title: `Edit Player - ${player.name}`, // Dynamic title
-      page: 'edit-player', // Current page identifier
-      player: player, // Pass player data to pre-fill form
-      error: null // Initialize error as null
+      title: `Edit Player - ${player.name}`,
+      page: 'edit-player',
+      player: player,
+      error: null
     });
   } catch (error) {
-    // Log error for debugging
     console.error('Error fetching player for edit:', error);
-    
-    // Render error page if player fetch fails
     res.status(500).render('error', {
       title: 'Error - Edit Player',
       message: 'Failed to load player for editing. Please try again.'
@@ -148,18 +134,17 @@ router.get('/:id/edit', async (req, res) => {
 });
 
 // PUT update player - Handle form submission for updating player
-router.post('/:id/update', async (req, res) => {
+router.put('/:id', async (req, res) => {
   try {
     // Find player by ID and update with new data from request body
     const player = await Player.findByIdAndUpdate(
-      req.params.id, // Player ID from URL parameters
-      req.body, // New data from form submission
-      { new: true, runValidators: true } // Options: return updated document, run validators
+      req.params.id,
+      req.body,
+      { new: true, runValidators: true }
     );
     
     // Check if player was found and updated
     if (!player) {
-      // Return 404 error if player not found
       return res.status(404).render('error', {
         title: 'Player Not Found',
         message: 'The player you are trying to update does not exist.'
@@ -169,12 +154,10 @@ router.post('/:id/update', async (req, res) => {
     // Redirect to player details page after successful update
     res.redirect(`/players/${player._id}`);
   } catch (error) {
-    // Log error for debugging
     console.error('Error updating player:', error);
     
     // Check if error is a validation error
     if (error.name === 'ValidationError') {
-      // Extract all validation error messages
       const errors = Object.values(error.errors).map(err => err.message);
       
       // Fetch player data again to re-render form
@@ -184,8 +167,8 @@ router.post('/:id/update', async (req, res) => {
       return res.render('players/edit', { 
         title: 'Edit Player',
         page: 'edit-player',
-        error: errors.join(', '), // Combine error messages
-        player: player // Pass player data back to form
+        error: errors.join(', '),
+        player: player
       });
     }
     
@@ -197,15 +180,14 @@ router.post('/:id/update', async (req, res) => {
   }
 });
 
-// DELETE player - Handle player deletion with confirmation
-router.post('/:id/delete', async (req, res) => {
+// DELETE player - Handle player deletion
+router.delete('/:id', async (req, res) => {
   try {
     // Find player by ID and delete from database
     const player = await Player.findByIdAndDelete(req.params.id);
     
     // Check if player was found and deleted
     if (!player) {
-      // Return 404 error if player not found
       return res.status(404).render('error', {
         title: 'Player Not Found',
         message: 'The player you are trying to delete does not exist.'
@@ -215,10 +197,7 @@ router.post('/:id/delete', async (req, res) => {
     // Redirect to players list after successful deletion
     res.redirect('/players');
   } catch (error) {
-    // Log error for debugging
     console.error('Error deleting player:', error);
-    
-    // Render error page if deletion fails
     res.status(500).render('error', { 
       title: 'Error - Delete Player',
       message: 'Failed to delete player. Please try again.'
