@@ -1,115 +1,79 @@
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const GitHubStrategy = require('passport-github2').Strategy;
-const mongoose = require('mongoose');
-
-// Try to import User model, but provide fallback if it fails
-let User;
-try {
-  User = require('../models/user');
-} catch (error) {
-  console.warn('⚠️ User model not found, creating fallback...');
-  // Create a simple in-memory user schema as fallback
-  const userSchema = new mongoose.Schema({
-    googleId: String,
-    githubId: String,
-    displayName: String,
-    email: String,
-    profilePhoto: String,
-    role: { type: String, default: 'user' }
-  }, { timestamps: true });
-  
-  User = mongoose.model('User', userSchema);
-}
+const User = require('./models/User');
 
 // Serialize user to session
 passport.serializeUser((user, done) => {
-  done(null, user._id || user.id);
+  done(null, user._id);
 });
 
 // Deserialize user from session
 passport.deserializeUser(async (id, done) => {
   try {
-    if (mongoose.Types.ObjectId.isValid(id)) {
-      const user = await User.findById(id);
-      done(null, user);
-    } else {
-      // Fallback for demo users
-      done(null, { 
-        _id: 'demo-user', 
-        displayName: 'Demo User', 
-        email: 'demo@example.com',
-        role: 'user' 
-      });
-    }
+    const user = await User.findById(id);
+    done(null, user);
   } catch (error) {
-    console.error('Deserialize error:', error);
     done(error, null);
   }
 });
 
-// Rest of your passport configuration remains the same...
+// Get base URL from environment
 const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
 
-const hasGoogleCredentials = process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET;
-const hasGitHubCredentials = process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET;
-
-console.log('OAuth Configuration:');
-console.log('- Google OAuth:', hasGoogleCredentials ? 'Configured' : 'Not Configured');
-console.log('- GitHub OAuth:', hasGitHubCredentials ? 'Configured' : 'Not Configured');
-
-if (hasGoogleCredentials) {
-  passport.use(new GoogleStrategy({
-    clientID: process.env.GOOGLE_CLIENT_ID,
-    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: `${BASE_URL}/auth/google/callback`
-  }, async (accessToken, refreshToken, profile, done) => {
-    try {
-      console.log('Google profile received:', profile.displayName);
-      const user = await User.findOrCreate(profile, 'google');
-      return done(null, user);
-    } catch (error) {
-      console.error('Google OAuth error:', error);
-      return done(error, null);
-    }
-  }));
-}
-
-if (hasGitHubCredentials) {
-  passport.use(new GitHubStrategy({
-    clientID: process.env.GITHUB_CLIENT_ID,
-    clientSecret: process.env.GITHUB_CLIENT_SECRET,
-    callbackURL: `${BASE_URL}/auth/github/callback`,
-    scope: ['user:email']
-  }, async (accessToken, refreshToken, profile, done) => {
-    try {
-      console.log('GitHub profile received:', profile.displayName);
-      const user = await User.findOrCreate(profile, 'github');
-      return done(null, user);
-    } catch (error) {
-      console.error('GitHub OAuth error:', error);
-      return done(error, null);
-    }
-  }));
-}
-
-// Fallback local strategy
-const LocalStrategy = require('passport-local').Strategy;
-passport.use(new LocalStrategy(
-  async (username, password, done) => {
-    try {
-      // Create a demo user
-      const demoUser = {
-        _id: 'demo-user-id',
-        displayName: 'Demo User',
-        email: 'demo@example.com',
-        role: 'user'
-      };
-      return done(null, demoUser);
-    } catch (error) {
-      return done(error);
-    }
+// Google OAuth Strategy
+passport.use(new GoogleStrategy({
+  clientID: process.env.GOOGLE_CLIENT_ID,
+  clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+  callbackURL: `${BASE_URL}/auth/google/callback`
+}, async (accessToken, refreshToken, profile, done) => {
+  try {
+    console.log('Google profile received:', profile.displayName);
+    
+    // Find or create user
+    const user = await User.findOrCreate(profile, 'google');
+    return done(null, user);
+    
+  } catch (error) {
+    console.error('Google OAuth error:', error);
+    return done(error, null);
   }
-));
+}));
+
+// GitHub OAuth Strategy - UPDATED
+passport.use(new GitHubStrategy({
+  clientID: process.env.GITHUB_CLIENT_ID,
+  clientSecret: process.env.GITHUB_CLIENT_SECRET,
+  callbackURL: `${BASE_URL}/auth/github/callback`,
+  scope: ['user:email', 'read:user']  // Added read:user scope
+}, async (accessToken, refreshToken, profile, done) => {
+  try {
+    console.log('GitHub profile received:', profile);
+    console.log('GitHub profile ID:', profile.id);
+    console.log('GitHub username:', profile.username);
+    console.log('GitHub emails:', profile.emails);
+    
+    // Enhanced profile handling for GitHub
+    const email = profile.emails && profile.emails[0] ? profile.emails[0].value : null;
+    const displayName = profile.displayName || profile.username || 'GitHub User';
+    
+    console.log('Processed email:', email);
+    console.log('Processed display name:', displayName);
+    
+    // Find or create user with enhanced profile data
+    const enhancedProfile = {
+      ...profile,
+      displayName: displayName,
+      email: email
+    };
+    
+    const user = await User.findOrCreate(enhancedProfile, 'github');
+    return done(null, user);
+    
+  } catch (error) {
+    console.error('GitHub OAuth error:', error);
+    return done(error, null);
+  }
+}));
 
 module.exports = passport;
