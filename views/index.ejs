@@ -50,7 +50,16 @@
                 <div class="alert alert-success mx-auto" style="max-width: 500px;">
                     <h4><i class="bi bi-check-circle-fill"></i> Successfully Logged In!</h4>
                     <p class="mb-0">Welcome, <strong><%= user.displayName %></strong>!</p>
-                    <small class="text-muted">Logged in with <%= user.googleId ? 'Google' : 'GitHub' %></small>
+                    <small class="text-muted">
+                        Logged in with 
+                        <% if (user.googleId) { %>
+                            Google
+                        <% } else if (user.githubId) { %>
+                            GitHub
+                        <% } else { %>
+                            OAuth
+                        <% } %>
+                    </small>
                 </div>
                 <a href="/players" class="btn btn-success btn-lg">
                     <i class="bi bi-speedometer2"></i> Go to Players Dashboard
