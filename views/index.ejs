@@ -9,18 +9,43 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark">
-        <div class="container">
-            <a class="navbar-brand" href="/">
-                <i class="bi bi-trophy-fill"></i> India Cricket Stats
-            </a>
+  <nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+        <a class="navbar-brand" href="/">
+            <i class="bi bi-trophy-fill"></i> India Cricket Stats
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <% if (isAuthenticated && user) { %>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/">
+                            <i class="bi bi-house"></i> Home
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/players">
+                            <i class="bi bi-people"></i> Players
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/players/new">
+                            <i class="bi bi-plus-circle"></i> Add Player
+                        </a>
+                    </li>
+                <% } %>
+            </ul>
             <div class="navbar-nav ms-auto">
                 <% if (isAuthenticated && user) { %>
                     <div class="d-flex align-items-center">
-                        <span class="text-light me-3">Welcome, <%= user.displayName || user.username || 'User' %></span>
-                        <a class="btn btn-outline-light btn-sm me-2" href="/players">
-                            <i class="bi bi-people"></i> Players
-                        </a>
+                        <% if (user.avatar) { %>
+                            <img src="<%= user.avatar %>" alt="Profile" class="rounded-circle me-2" width="32" height="32">
+                        <% } else { %>
+                            <i class="bi bi-person-circle me-2 text-light"></i>
+                        <% } %>
+                        <span class="text-light me-3"><%= user.displayName || user.name || 'User' %></span>
                         <a class="btn btn-outline-warning btn-sm" href="/auth/logout">
                             <i class="bi bi-box-arrow-right"></i> Logout
                         </a>
@@ -30,14 +55,15 @@
                         <a class="btn btn-outline-light btn-sm me-2" href="/auth/google">
                             <i class="bi bi-google"></i> Google
                         </a>
-                        <a class="btn btn-outline-light btn-sm me-2" href="/auth/github">
+                        <a class="btn btn-outline-light btn-sm" href="/auth/github">
                             <i class="bi bi-github"></i> GitHub
                         </a>
                     </div>
                 <% } %>
             </div>
         </div>
-    </nav>
+    </div>
+</nav>
 
     <main class="container my-5">
         <div class="text-center">
