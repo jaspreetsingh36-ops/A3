@@ -1,7 +1,7 @@
 // routes/players.js
 const express = require('express');
 const router = express.Router();
-const Player = require('./models/Players');
+const Player = require('./models/player');
 const { requireAuth } = require('../config/auth');
 
 // ===== PUBLIC ROUTES =====
