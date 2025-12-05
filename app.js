@@ -2,7 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const Player = require('./models/player');
-const { requireAuth } = require('../config/auth');
+const { requireAuth } = require('./config/auth');
 
 // ===== PUBLIC ROUTES =====
 // View all players (PUBLIC - no authentication required)
